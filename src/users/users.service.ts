@@ -9,7 +9,9 @@ export class UsersService {
 
   async createUser(name: string, email: string, password: string): Promise<User> {
     const newUser = new this.userModel({ name, email, password });
-    return newUser.save();
+    const user = await newUser.save();
+    const { password: _, ...userWithoutPassword } = user.toObject();
+    return userWithoutPassword as User;
   }
 
   async findAllUsers(): Promise<User[]> {
@@ -23,6 +25,10 @@ export class UsersService {
   async findByUserid(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec(); 
   }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+}   
 
   async updateUser(id: string, name: string, email: string): Promise<User> {
     return this.userModel.findByIdAndUpdate(
